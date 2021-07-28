@@ -4,6 +4,8 @@ use super::{cmp_slice, BigUint};
 use crate::big_digit::{self, BigDigit, DoubleBigDigit};
 use crate::UsizePromotion;
 
+use crate::backend;
+
 use core::cmp::Ordering::{Equal, Greater, Less};
 use core::mem;
 use core::ops::{Div, DivAssign, Rem, RemAssign};
@@ -72,6 +74,12 @@ fn div_half(rem: BigDigit, digit: BigDigit, divisor: BigDigit) -> (BigDigit, Big
 pub(super) fn div_rem_digit(mut a: BigUint, b: BigDigit) -> (BigUint, BigDigit) {
     if b == 0 {
         panic!("attempt to divide by zero")
+    }
+
+    if backend::inlined(&a.data) {
+        if let Some(x) = a.to_u64() {
+            return (BigUint::from(x / b), x % b);
+        }
     }
 
     let mut rem = 0;
@@ -266,7 +274,7 @@ fn div_rem_core(mut a: BigUint, b: &[BigDigit]) -> (BigUint, BigUint) {
 
     let q_len = a.data.len() - b.len() + 1;
     let mut q = BigUint {
-        data: vec![0; q_len],
+        data: backend::vec![0; q_len],
     };
 
     for j in (0..q_len).rev() {

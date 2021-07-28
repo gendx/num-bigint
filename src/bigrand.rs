@@ -3,6 +3,7 @@
 use rand::distributions::uniform::{SampleBorrow, SampleUniform, UniformSampler};
 use rand::prelude::*;
 
+use crate::big_digit::BigDigit;
 use crate::BigInt;
 use crate::BigUint;
 use crate::Sign::*;
@@ -37,12 +38,12 @@ pub trait RandBigInt {
     fn gen_bigint_range(&mut self, lbound: &BigInt, ubound: &BigInt) -> BigInt;
 }
 
-fn gen_bits<R: Rng + ?Sized>(rng: &mut R, data: &mut [u32], rem: u64) {
+fn gen_bits<R: Rng + ?Sized>(rng: &mut R, data: &mut [BigDigit], rem: u64) {
     // `fill` is faster than many `gen::<u32>` calls
     rng.fill(data);
     if rem > 0 {
         let last = data.len() - 1;
-        data[last] >>= 32 - rem;
+        data[last] >>= crate::big_digit::BITS as u64 - rem;
     }
 }
 
