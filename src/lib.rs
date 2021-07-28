@@ -108,6 +108,51 @@ extern crate std;
 
 use core::fmt;
 
+#[cfg(feature = "smallvec")]
+mod backend {
+
+    const INLINED: usize = 2;
+
+    pub(crate) use smallvec::{smallvec as vec, SmallVec};
+    pub(crate) type Vec<T> = SmallVec<[T; INLINED]>;
+
+    pub(crate) fn clone<T: Copy>(vec: &Vec<T>) -> Vec<T> {
+        Vec::from_slice(vec) // This uses memcpy rather than repeated calls to .clone().
+    }
+
+    pub(crate) fn from_slice<T: Copy>(slice: &[T]) -> Vec<T> {
+        Vec::from_slice(slice)
+    }
+
+    pub(crate) fn from_vec<T: Copy>(vec: alloc::vec::Vec<T>) -> Vec<T> {
+        Vec::from_vec(vec)
+    }
+
+    pub(crate) fn inlined<T: Copy>(vec: &Vec<T>) -> bool {
+        !vec.spilled()
+    }
+}
+
+#[cfg(not(feature = "smallvec"))]
+mod backend {
+    pub(crate) use alloc::{vec, vec::Vec};
+    pub(crate) fn clone<T: Copy>(vec: &Vec<T>) -> Vec<T> {
+        vec.clone()
+    }
+
+    pub(crate) fn from_slice<T: Copy>(slice: &[T]) -> Vec<T> {
+        slice.to_vec()
+    }
+
+    pub(crate) fn from_vec<T: Copy>(vec: Vec<T>) -> Vec<T> {
+        vec
+    }
+
+    pub(crate) fn inlined<T: Copy>(_vec: &Vec<T>) -> bool {
+        false
+    }
+}
+
 #[macro_use]
 mod macros;
 
@@ -265,4 +310,8 @@ mod big_digit {
     pub(crate) fn to_doublebigdigit(hi: BigDigit, lo: BigDigit) -> DoubleBigDigit {
         DoubleBigDigit::from(lo) | (DoubleBigDigit::from(hi) << BITS)
     }
+}
+
+pub fn mul_test(a: &BigUint, b: &BigUint) -> BigUint {
+    a * b
 }

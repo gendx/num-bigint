@@ -3,6 +3,8 @@ use super::{BigUint, IntDigits};
 use crate::big_digit::{self, BigDigit};
 use crate::UsizePromotion;
 
+use crate::backend;
+
 use core::iter::Sum;
 use core::ops::{Add, AddAssign};
 use num_traits::CheckedAdd;
@@ -91,7 +93,14 @@ forward_val_assign!(impl AddAssign for BigUint, add_assign);
 impl Add<&BigUint> for BigUint {
     type Output = BigUint;
 
+    #[inline]
     fn add(mut self, other: &BigUint) -> BigUint {
+        if backend::inlined(&other.data) {
+            use num_traits::ToPrimitive;
+            if let Some(x) = other.to_u64() {
+                return self + x;
+            }
+        }
         self += other;
         self
     }
@@ -99,6 +108,13 @@ impl Add<&BigUint> for BigUint {
 impl AddAssign<&BigUint> for BigUint {
     #[inline]
     fn add_assign(&mut self, other: &BigUint) {
+        if backend::inlined(&other.data) {
+            use num_traits::ToPrimitive;
+            if let Some(x) = other.to_u64() {
+                self.add_assign(x);
+                return;
+            }
+        }
         let self_len = self.data.len();
         let carry = if self_len < other.data.len() {
             let lo_carry = __add2(&mut self.data[..], &other.data[..self_len]);
@@ -150,6 +166,12 @@ impl Add<u64> for BigUint {
 
     #[inline]
     fn add(mut self, other: u64) -> BigUint {
+        use num_traits::ToPrimitive;
+        if backend::inlined(&self.data) {
+            if let Some(x) = self.to_u64() {
+                return BigUint::from(x as u128 + other as u128);
+            }
+        }
         self += other;
         self
     }
