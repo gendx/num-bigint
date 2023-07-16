@@ -21,6 +21,7 @@ arbitrary = ["dep:arbitrary"]
 quickcheck = ["dep:quickcheck"]
 rand = ["dep:rand"]
 serde = ["dep:serde"]
+nosmallvec = []
 
 [package.metadata.docs.rs]
 features = ["std", "serde", "rand", "quickcheck", "arbitrary"]
@@ -42,7 +43,7 @@ harness = false
 name = "shootout-pidigits"
 
 [dependencies]
-smallvec = { version = "1.6.1", optional = true, features = ["union"] }
+smallvec = { version = "1.6.1", features = ["union"] }
 
 [dependencies.num-integer]
 version = "0.1.46"
