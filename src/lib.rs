@@ -108,7 +108,7 @@ extern crate std;
 
 use core::fmt;
 
-#[cfg(feature = "smallvec")]
+#[cfg(not(feature = "nosmallvec"))]
 mod backend {
 
     const INLINED: usize = 2;
@@ -133,7 +133,7 @@ mod backend {
     }
 }
 
-#[cfg(not(feature = "smallvec"))]
+#[cfg(feature = "nosmallvec")]
 mod backend {
     pub(crate) use alloc::{vec, vec::Vec};
     pub(crate) fn clone<T: Copy>(vec: &Vec<T>) -> Vec<T> {
