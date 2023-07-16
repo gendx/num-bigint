@@ -98,7 +98,7 @@ mod std_alloc {
     #[cfg(any(feature = "quickcheck"))]
     pub(crate) use std::boxed::Box;
     pub(crate) use std::string::String;
-    #[cfg(not(feature = "smallvec"))]
+    #[cfg(feature = "nosmallvec")]
     pub(crate) use std::vec;
     pub(crate) use std::vec::Vec;
 }
@@ -113,7 +113,7 @@ mod std_alloc {
     #[cfg(any(feature = "quickcheck"))]
     pub(crate) use alloc::boxed::Box;
     pub(crate) use alloc::string::String;
-    #[cfg(not(feature = "smallvec"))]
+    #[cfg(feature = "nosmallvec")]
     pub(crate) use alloc::vec;
     pub(crate) use alloc::vec::Vec;
 }
@@ -122,7 +122,7 @@ use core::fmt;
 #[cfg(feature = "std")]
 use std::error::Error;
 
-#[cfg(feature = "smallvec")]
+#[cfg(not(feature = "nosmallvec"))]
 mod backend {
 
     const INLINED: usize = 2;
@@ -147,7 +147,7 @@ mod backend {
     }
 }
 
-#[cfg(not(feature = "smallvec"))]
+#[cfg(feature = "nosmallvec")]
 mod backend {
     pub(crate) use crate::std_alloc::{vec, Vec};
     pub(crate) fn clone<T: Copy>(vec: &Vec<T>) -> Vec<T> {
