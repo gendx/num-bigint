@@ -171,12 +171,12 @@ fn div_rem(mut u: BigUint, mut d: BigUint) -> (BigUint, BigUint) {
         panic!("attempt to divide by zero")
     }
     if u.is_zero() {
-        return (BigUint::ZERO, BigUint::ZERO);
+        return (BigUint::zero(), BigUint::zero());
     }
 
     if d.data.len() == 1 {
-        if d.data == [1] {
-            return (u, BigUint::ZERO);
+        if d.data[0] == 1 {
+            return (u, BigUint::zero());
         }
         let (div, rem) = div_rem_digit(u, d.data[0]);
         // reuse d
@@ -187,10 +187,10 @@ fn div_rem(mut u: BigUint, mut d: BigUint) -> (BigUint, BigUint) {
 
     // Required or the q_len calculation below can underflow:
     match u.cmp(&d) {
-        Less => return (BigUint::ZERO, u),
+        Less => return (BigUint::zero(), u),
         Equal => {
             u.set_one();
-            return (u, BigUint::ZERO);
+            return (u, BigUint::zero());
         }
         Greater => {} // Do nothing
     }
@@ -218,12 +218,12 @@ pub(super) fn div_rem_ref(u: &BigUint, d: &BigUint) -> (BigUint, BigUint) {
         panic!("attempt to divide by zero")
     }
     if u.is_zero() {
-        return (BigUint::ZERO, BigUint::ZERO);
+        return (BigUint::zero(), BigUint::zero());
     }
 
     if d.data.len() == 1 {
-        if d.data == [1] {
-            return (u.clone(), BigUint::ZERO);
+        if d.data[0] == 1 {
+            return (u.clone(), BigUint::zero());
         }
 
         let (div, rem) = div_rem_digit(u.clone(), d.data[0]);
@@ -232,8 +232,8 @@ pub(super) fn div_rem_ref(u: &BigUint, d: &BigUint) -> (BigUint, BigUint) {
 
     // Required or the q_len calculation below can underflow:
     match u.cmp(d) {
-        Less => return (BigUint::ZERO, u.clone()),
-        Equal => return (One::one(), BigUint::ZERO),
+        Less => return (BigUint::zero(), u.clone()),
+        Equal => return (One::one(), BigUint::zero()),
         Greater => {} // Do nothing
     }
 
@@ -410,7 +410,7 @@ impl Div<BigUint> for u32 {
         match other.data.len() {
             0 => panic!("attempt to divide by zero"),
             1 => From::from(self as BigDigit / other.data[0]),
-            _ => BigUint::ZERO,
+            _ => BigUint::zero(),
         }
     }
 }
@@ -428,7 +428,7 @@ impl DivAssign<u64> for BigUint {
     #[inline]
     fn div_assign(&mut self, other: u64) {
         // a vec of size 0 does not allocate, so this is fairly cheap
-        let temp = mem::replace(self, Self::ZERO);
+        let temp = mem::replace(self, Self::zero());
         *self = temp / other;
     }
 }
@@ -443,7 +443,7 @@ impl Div<BigUint> for u64 {
                 0 => panic!("attempt to divide by zero"),
                 1 => From::from(self / u64::from(other.data[0])),
                 2 => From::from(self / big_digit::to_doublebigdigit(other.data[1], other.data[0])),
-                _ => BigUint::ZERO,
+                _ => BigUint::zero(),
             }
         }
 
@@ -452,7 +452,7 @@ impl Div<BigUint> for u64 {
             match other.data.len() {
                 0 => panic!("attempt to divide by zero"),
                 1 => From::from(self / other.data[0]),
-                _ => BigUint::ZERO,
+                _ => BigUint::zero(),
             }
         }
     );
@@ -492,7 +492,7 @@ impl Div<BigUint> for u128 {
                 4 => From::from(
                     self / u32_to_u128(other.data[3], other.data[2], other.data[1], other.data[0]),
                 ),
-                _ => BigUint::ZERO,
+                _ => BigUint::zero(),
             }
         }
 
@@ -502,7 +502,7 @@ impl Div<BigUint> for u128 {
                 0 => panic!("attempt to divide by zero"),
                 1 => From::from(self / other.data[0] as u128),
                 2 => From::from(self / big_digit::to_doublebigdigit(other.data[1], other.data[0])),
-                _ => BigUint::ZERO,
+                _ => BigUint::zero(),
             }
         }
     );

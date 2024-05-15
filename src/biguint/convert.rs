@@ -159,7 +159,7 @@ pub(super) fn from_radix_be(buf: &[u8], radix: u32) -> Option<BigUint> {
     );
 
     if buf.is_empty() {
-        return Some(BigUint::ZERO);
+        return Some(Zero::zero());
     }
 
     if radix != 256 && buf.iter().any(|&b| b >= radix as u8) {
@@ -190,7 +190,7 @@ pub(super) fn from_radix_le(buf: &[u8], radix: u32) -> Option<BigUint> {
     );
 
     if buf.is_empty() {
-        return Some(BigUint::ZERO);
+        return Some(Zero::zero());
     }
 
     if radix != 256 && buf.iter().any(|&b| b >= radix as u8) {
@@ -468,7 +468,7 @@ impl FromPrimitive for BigUint {
 
         // handle 0.x, -0.x
         if n.is_zero() {
-            return Some(Self::ZERO);
+            return Some(Zero::zero());
         }
 
         let (mantissa, exponent, sign) = FloatCore::integer_decode(n);
@@ -490,7 +490,7 @@ impl FromPrimitive for BigUint {
 impl From<u64> for BigUint {
     #[inline]
     fn from(mut n: u64) -> Self {
-        let mut ret: BigUint = Self::ZERO;
+        let mut ret: BigUint = Zero::zero();
 
         while n != 0 {
             ret.data.push(n as BigDigit);
@@ -505,7 +505,7 @@ impl From<u64> for BigUint {
 impl From<u128> for BigUint {
     #[inline]
     fn from(mut n: u128) -> Self {
-        let mut ret: BigUint = Self::ZERO;
+        let mut ret: BigUint = Zero::zero();
 
         while n != 0 {
             ret.data.push(n as BigDigit);
@@ -592,7 +592,7 @@ impl From<bool> for BigUint {
         if x {
             One::one()
         } else {
-            Self::ZERO
+            Zero::zero()
         }
     }
 }

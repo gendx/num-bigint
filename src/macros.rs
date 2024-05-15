@@ -450,7 +450,7 @@ macro_rules! impl_sum_iter_type {
             where
                 I: Iterator<Item = T>,
             {
-                iter.fold(Self::ZERO, <$res>::add)
+                iter.fold(Self::zero(), <$res>::add)
             }
         }
     };

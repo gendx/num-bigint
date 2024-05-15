@@ -7,7 +7,7 @@ use crate::backend;
 
 use core::iter::Sum;
 use core::ops::{Add, AddAssign};
-use num_traits::CheckedAdd;
+use num_traits::{CheckedAdd, Zero};
 
 #[cfg(target_arch = "x86_64")]
 use core::arch::x86_64 as arch;
