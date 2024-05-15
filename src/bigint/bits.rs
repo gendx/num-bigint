@@ -113,7 +113,7 @@ impl BitAnd<&BigInt> for &BigInt {
     #[inline]
     fn bitand(self, other: &BigInt) -> BigInt {
         match (self.sign, other.sign) {
-            (NoSign, _) | (_, NoSign) => BigInt::ZERO,
+            (NoSign, _) | (_, NoSign) => BigInt::zero(),
             (Plus, Plus) => BigInt::from(&self.data & &other.data),
             (Plus, Minus) => self.clone() & other,
             (Minus, Plus) => other.clone() & self,

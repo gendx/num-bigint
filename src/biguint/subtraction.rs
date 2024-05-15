@@ -7,7 +7,7 @@ use crate::backend;
 
 use core::cmp::Ordering::{Equal, Greater, Less};
 use core::ops::{Sub, SubAssign};
-use num_traits::CheckedSub;
+use num_traits::{CheckedSub, Zero};
 
 // Subtract with borrow:
 #[cfg(target_arch = "x86_64")]
@@ -308,7 +308,7 @@ impl CheckedSub for BigUint {
     fn checked_sub(&self, v: &BigUint) -> Option<BigUint> {
         match self.cmp(v) {
             Less => None,
-            Equal => Some(Self::ZERO),
+            Equal => Some(Zero::zero()),
             Greater => Some(self.sub(v)),
         }
     }

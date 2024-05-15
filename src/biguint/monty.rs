@@ -1,7 +1,7 @@
 use crate::std_alloc::Vec;
 use core::mem;
 use core::ops::Shl;
-use num_traits::One;
+use num_traits::{One, Zero};
 
 use crate::big_digit::{self, BigDigit, DoubleBigDigit, SignedDoubleBigDigit};
 use crate::biguint::BigUint;
@@ -58,7 +58,7 @@ fn montgomery(x: &BigUint, y: &BigUint, m: &BigUint, k: BigDigit, n: usize) -> B
         n
     );
 
-    let mut z = BigUint::ZERO;
+    let mut z = BigUint::zero();
     z.data.resize(n * 2, 0);
 
     let mut c: BigDigit = 0;
@@ -175,7 +175,7 @@ pub(super) fn monty_modpow(x: &BigUint, y: &BigUint, m: &BigUint) -> BigUint {
     // initialize z = 1 (Montgomery 1)
     let mut z = powers[0].clone();
     z.data.resize(num_words, 0);
-    let mut zz = BigUint::ZERO;
+    let mut zz = BigUint::zero();
     zz.data.resize(num_words, 0);
 
     // same windowed exponent, but with Montgomery multiplications

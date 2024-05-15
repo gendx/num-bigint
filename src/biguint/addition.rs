@@ -7,7 +7,7 @@ use crate::backend;
 
 use core::iter::Sum;
 use core::ops::{Add, AddAssign};
-use num_traits::CheckedAdd;
+use num_traits::{CheckedAdd, Zero};
 
 // Add with carry:
 #[cfg(target_arch = "x86_64")]

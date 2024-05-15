@@ -10,7 +10,7 @@ use core::ops::{Neg, Not};
 use core::str;
 
 use num_integer::{Integer, Roots};
-use num_traits::{ConstZero, Num, One, Pow, Signed, Zero};
+use num_traits::{Num, One, Pow, Signed, Zero};
 
 use self::Sign::{Minus, NoSign, Plus};
 
@@ -130,7 +130,7 @@ impl Ord for BigInt {
 impl Default for BigInt {
     #[inline]
     fn default() -> BigInt {
-        Self::ZERO
+        Self::zero()
     }
 }
 
@@ -209,7 +209,10 @@ impl Not for &BigInt {
 impl Zero for BigInt {
     #[inline]
     fn zero() -> BigInt {
-        Self::ZERO
+        BigInt {
+            sign: NoSign,
+            data: BigUint::zero(),
+        }
     }
 
     #[inline]
@@ -222,11 +225,6 @@ impl Zero for BigInt {
     fn is_zero(&self) -> bool {
         self.sign == NoSign
     }
-}
-
-impl ConstZero for BigInt {
-    // forward to the inherent const
-    const ZERO: Self = Self::ZERO;
 }
 
 impl One for BigInt {
@@ -262,7 +260,7 @@ impl Signed for BigInt {
     #[inline]
     fn abs_sub(&self, other: &BigInt) -> BigInt {
         if *self <= *other {
-            Self::ZERO
+            Self::zero()
         } else {
             self - other
         }
@@ -273,7 +271,7 @@ impl Signed for BigInt {
         match self.sign {
             Plus => BigInt::one(),
             Minus => -BigInt::one(),
-            NoSign => Self::ZERO,
+            NoSign => Self::zero(),
         }
     }
 
@@ -453,7 +451,7 @@ impl Integer for BigInt {
     fn extended_gcd_lcm(&self, other: &BigInt) -> (num_integer::ExtendedGcd<BigInt>, BigInt) {
         let egcd = self.extended_gcd(other);
         let lcm = if egcd.gcd.is_zero() {
-            Self::ZERO
+            Self::zero()
         } else {
             BigInt::from(&self.data / &egcd.gcd.data * &other.data)
         };
@@ -566,12 +564,6 @@ pub trait ToBigInt {
 }
 
 impl BigInt {
-    /// A constant `BigInt` with value 0, useful for static initialization.
-    pub const ZERO: Self = BigInt {
-        sign: NoSign,
-        data: BigUint::ZERO,
-    };
-
     /// Creates and initializes a [`BigInt`].
     ///
     /// The base 2<sup>32</sup> digits are ordered least significant digit first.
@@ -927,10 +919,11 @@ impl BigInt {
     ///
     /// ```
     /// use num_bigint::{BigInt, Sign};
+    /// use num_traits::Zero;
     ///
     /// assert_eq!(BigInt::from(1234).sign(), Sign::Plus);
     /// assert_eq!(BigInt::from(-4321).sign(), Sign::Minus);
-    /// assert_eq!(BigInt::ZERO.sign(), Sign::NoSign);
+    /// assert_eq!(BigInt::zero().sign(), Sign::NoSign);
     /// ```
     #[inline]
     pub fn sign(&self) -> Sign {
@@ -947,7 +940,7 @@ impl BigInt {
     ///
     /// assert_eq!(BigInt::from(1234).magnitude(), &BigUint::from(1234u32));
     /// assert_eq!(BigInt::from(-4321).magnitude(), &BigUint::from(4321u32));
-    /// assert!(BigInt::ZERO.magnitude().is_zero());
+    /// assert!(BigInt::zero().magnitude().is_zero());
     /// ```
     #[inline]
     pub fn magnitude(&self) -> &BigUint {
@@ -961,10 +954,11 @@ impl BigInt {
     ///
     /// ```
     /// use num_bigint::{BigInt, BigUint, Sign};
+    /// use num_traits::Zero;
     ///
     /// assert_eq!(BigInt::from(1234).into_parts(), (Sign::Plus, BigUint::from(1234u32)));
     /// assert_eq!(BigInt::from(-4321).into_parts(), (Sign::Minus, BigUint::from(4321u32)));
-    /// assert_eq!(BigInt::ZERO.into_parts(), (Sign::NoSign, BigUint::ZERO));
+    /// assert_eq!(BigInt::zero().into_parts(), (Sign::NoSign, BigUint::zero()));
     /// ```
     #[inline]
     pub fn into_parts(self) -> (Sign, BigUint) {
@@ -983,7 +977,7 @@ impl BigInt {
     pub fn to_biguint(&self) -> Option<BigUint> {
         match self.sign {
             Plus => Some(self.data.clone()),
-            NoSign => Some(BigUint::ZERO),
+            NoSign => Some(BigUint::zero()),
             Minus => None,
         }
     }
